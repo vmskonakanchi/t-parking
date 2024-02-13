@@ -1,4 +1,4 @@
-import {Button, StyleSheet, Text, TouchableHighlight, View} from 'react-native';
+import {StyleSheet, Text, TouchableHighlight} from 'react-native';
 import React from 'react';
 import {COLORS, FONT_SIZES} from '../constants';
 
@@ -6,18 +6,17 @@ type MyButtonProps = {
   title: string;
   onPress: () => void;
 };
+
 const MyButton = (props: MyButtonProps) => {
   const {title, onPress} = props;
 
   return (
-    <View>
-      <TouchableHighlight
-        onPress={onPress}
-        style={styles.button}
-        underlayColor={COLORS.TEXT}>
-        <Text style={styles.buttonText}>{title}</Text>
-      </TouchableHighlight>
-    </View>
+    <TouchableHighlight
+      onPress={onPress}
+      style={styles.button}
+      underlayColor={COLORS.TEXT}>
+      <Text style={styles.buttonText}>{title}</Text>
+    </TouchableHighlight>
   );
 };
 

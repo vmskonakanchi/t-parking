@@ -1,4 +1,4 @@
-import {StyleSheet, View, TextInput} from 'react-native';
+import {StyleSheet, TextInput} from 'react-native';
 import React from 'react';
 import {COLORS, FONT_SIZES} from '../constants';
 
@@ -14,16 +14,14 @@ const EditInput = (props: EditInputProps) => {
   const {label, value, onChangeText, keyBoardType, autoFocus} = props;
 
   return (
-    <View>
-      <TextInput
-        placeholder={label}
-        style={styles.inputStyles}
-        onChangeText={onChangeText}
-        placeholderTextColor={COLORS.LIGHT_BLACK}
-        secureTextEntry={keyBoardType === 'password'}
-        autoFocus={autoFocus || false}
-      />
-    </View>
+    <TextInput
+      placeholder={label}
+      style={styles.inputStyles}
+      onChangeText={onChangeText}
+      placeholderTextColor={COLORS.LIGHT_BLACK}
+      secureTextEntry={keyBoardType === 'password'}
+      autoFocus={autoFocus || false}
+    />
   );
 };
 
@@ -38,6 +36,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 10,
     fontSize: FONT_SIZES.MEDIUM,
+    height: 70,
     width: 350,
     padding: 15,
     marginVertical: 10,

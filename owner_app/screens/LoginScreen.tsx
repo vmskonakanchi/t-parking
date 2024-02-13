@@ -1,11 +1,31 @@
-import {ScrollView, StyleSheet, Text, View} from 'react-native';
-import React from 'react';
+import {Alert, ScrollView, StyleSheet, Text, View} from 'react-native';
+import React, {useState} from 'react';
 import {Dimensions} from 'react-native';
 import {COLORS} from '../constants';
 import EditInput from '../components/EditInput';
 import MyButton from '../components/MyButton';
+import api from '../api/api';
+import Loader from '../components/Loader';
 
 const LoginScreen = () => {
+  const [details, setDetails] = useState({username: '', password: ''});
+  const [loading, setLoading] = useState(false);
+
+  const handleChange = (text: string, type: 'username' | 'password') => {
+    setDetails({...details, [type]: text});
+  };
+
+  const handleSubmit = async () => {
+    setLoading(true);
+    try {
+      const res = await api.post('/', details);
+      setLoading(false);
+    } catch (error: any) {
+      Alert.alert('Error', error.message);
+      setLoading(false);
+    }
+  };
+
   return (
     <ScrollView style={styles.bg}>
       <View style={styles.logoContainer}>
@@ -13,17 +33,23 @@ const LoginScreen = () => {
       </View>
       <View style={styles.container}>
         <Text style={styles.text}>Login</Text>
-        <EditInput
-          label="Enter username"
-          onChangeText={console.log}
-          autoFocus
-        />
-        <EditInput
-          label="Enter password"
-          onChangeText={console.log}
-          keyBoardType="password"
-        />
-        <MyButton title="Submit" onPress={console.log} />
+        {loading ? (
+          <Loader marginTop={50} />
+        ) : (
+          <>
+            <EditInput
+              label="Enter username"
+              onChangeText={text => handleChange(text, 'username')}
+              autoFocus
+            />
+            <EditInput
+              label="Enter password"
+              keyBoardType="password"
+              onChangeText={text => handleChange(text, 'password')}
+            />
+            <MyButton title="Submit" onPress={handleSubmit} />
+          </>
+        )}
       </View>
     </ScrollView>
   );
