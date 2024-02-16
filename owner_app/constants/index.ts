@@ -1,9 +1,9 @@
 export const SCREEN_NAMES = {
-  LOGIN: 'login',
-  DASHBOARD: 'dashboard',
-  USER_CREATE: 'userCreate',
-  PARKINGS: 'parkings',
-  MAIN_NAV: 'mainNav',
+  LOGIN: 'Login',
+  DASHBOARD: 'Dashboard',
+  USER_CREATE: 'UserCreate',
+  PARKINGS: 'Parkings',
+  MAIN_NAV: 'MainNav',
 };
 
 export const COLORS = {

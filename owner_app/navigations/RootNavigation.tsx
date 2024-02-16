@@ -16,6 +16,7 @@ const RootNavigation = () => {
         component={Screens.LoginScreen}
       />
       <StackNavigator.Screen
+        options={{headerShown: false}}
         name={SCREEN_NAMES.MAIN_NAV}
         component={TabNavigation}
       />

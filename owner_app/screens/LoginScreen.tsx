@@ -1,17 +1,18 @@
 import {Alert, ScrollView, StyleSheet, Text, View} from 'react-native';
 import React, {useState} from 'react';
-import {Dimensions} from 'react-native';
-import {COLORS} from '../constants';
+import {COLORS, SCREEN_NAMES} from '../constants';
 import EditInput from '../components/EditInput';
 import MyButton from '../components/MyButton';
 import api from '../api/api';
 import Loader from '../components/Loader';
 
-const LoginScreen = () => {
+type InputName = 'username' | 'password';
+
+const LoginScreen = ({navigation}: any) => {
   const [details, setDetails] = useState({username: '', password: ''});
   const [loading, setLoading] = useState(false);
 
-  const handleChange = (text: string, type: 'username' | 'password') => {
+  const handleChange = (text: string, type: InputName) => {
     setDetails({...details, [type]: text});
   };
 
@@ -19,11 +20,12 @@ const LoginScreen = () => {
     setLoading(true);
     try {
       const res = await api.post('/', details);
-      setLoading(false);
     } catch (error: any) {
       Alert.alert('Error', error.message);
-      setLoading(false);
     }
+    setLoading(false);
+    // navigating to another screen
+    navigation.navigate(SCREEN_NAMES.MAIN_NAV);
   };
 
   return (
