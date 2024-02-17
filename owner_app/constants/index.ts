@@ -4,6 +4,8 @@ export const SCREEN_NAMES = {
   USER_CREATE: 'UserCreate',
   PARKINGS: 'Parkings',
   MAIN_NAV: 'MainNav',
+  ADD_USER: 'Add User',
+  USER_NAV: 'UserNav',
 };
 
 export const COLORS = {

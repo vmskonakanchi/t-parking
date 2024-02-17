@@ -46,7 +46,7 @@ const LoginScreen = ({navigation}: any) => {
             />
             <EditInput
               label="Enter password"
-              keyBoardType="password"
+              secureTextEntry={true}
               onChangeText={text => handleChange(text, 'password')}
             />
             <MyButton title="Submit" onPress={handleSubmit} />

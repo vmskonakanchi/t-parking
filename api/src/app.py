@@ -1,5 +1,5 @@
 from fastapi import FastAPI,Request
-from fastapi.middleware.gzip import GZipMiddleware 
+from fastapi.middleware.gzip import GZipMiddleware
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
 from constants import WELCOME_MESSAGE,HOST,PORT,SERVERS
@@ -10,13 +10,13 @@ from controllers.user_controller import router as user_router
 from controllers.parking_controller import router as parking_router
 
 app = FastAPI(title='T-Parking',description='Api for the T-Parking',version='1.0.0',servers=SERVERS)
-app.add_middleware(GZipMiddleware , minimum_size=1000) # compresses the response if size is greater than 1000 bytes (1kb)
-app.add_middleware(CORSMiddleware , allow_origins=['*'],allow_credentials=True,allow_methods=['*'],allow_headers=['*']) # allows all origins to access the api
+app.add_middleware(GZipMiddleware,minimum_size=1000) # compresses the response if size is greater than 1000 bytes (1kb)
+app.add_middleware(CORSMiddleware,allow_origins=['*'],allow_credentials=True,allow_methods=['*'],allow_headers=['*']) # allows all origins to access the api
 
 @app.middleware('http')
 async def check_token(request:Request,call_next):
     response = await call_next(request)
-    response.headers['X-Powered-By'] = 'Young Minds Technology Solutions Pvt Ltd'
+    response.headers['X-Powered-By'] = 'VL Solution Pvt Ltd'
     return response
 
 app.include_router(client_router)

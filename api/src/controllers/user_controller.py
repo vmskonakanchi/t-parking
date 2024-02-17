@@ -3,7 +3,7 @@ from fastapi import Response
 from db import db_query
 from constants import TBL_USERS,TBL_SESSIONS,TBL_SHOWS
 from dto.models import UserDto,LoginDto
-from utils.converters import convert_to_user
+from utils.converters import convert_to_user_all,convert_to_user
 
 router = APIRouter(prefix='/api/users' , tags=['users'])
 
@@ -49,7 +49,7 @@ async def get_users():
     rows = await db_query(sql)
     users = []
     for row in rows:
-        users.append(convert_to_user(row))
+        users.append(convert_to_user_all(row))
     return users
 
 @router.get('/{id}')

@@ -22,6 +22,18 @@ def convert_to_user(row):
         'status':row[3],
     }
 
+def convert_to_user_all(row):
+    return {
+        'id':row[0],
+        'name':row[1],
+        'phone':row[2],
+        'client_id':row[3],
+        'is_owner':row[4],
+        'username' : row[5],
+        'email' : row[6],
+        # 'password' : row[7],
+    }
+
 def convert_to_parking(row):
     return {
         'id':row[0],

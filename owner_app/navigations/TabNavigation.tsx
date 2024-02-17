@@ -70,7 +70,7 @@ const TabNavigation = ({navigation}: any) => {
   };
 
   return (
-    <Tab.Navigator>
+    <Tab.Navigator screenOptions={{tabBarHideOnKeyboard: true}}>
       <Tab.Screen
         options={homeOptions}
         name={SCREEN_NAMES.DASHBOARD}
@@ -79,7 +79,7 @@ const TabNavigation = ({navigation}: any) => {
       <Tab.Screen
         options={userCreateOptions}
         name={SCREEN_NAMES.USER_CREATE}
-        component={Screens.UserCreateScreen}
+        component={Screens.UserListScreen}
       />
       <Tab.Screen
         options={parkingOptions}
