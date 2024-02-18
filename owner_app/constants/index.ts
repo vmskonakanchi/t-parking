@@ -10,11 +10,13 @@ export const SCREEN_NAMES = {
 
 export const COLORS = {
   PRIMARY: '#FF5733',
+  PRIMARY_DISABLED: '#6F2212',
   SECONDARY: '#001F3F',
   TEXT: '#FFFFFF',
   WHITE: '#FFFFFF',
   TEXT_BLACK: '#000000',
   LIGHT_BLACK: '#A4A2A2',
+  RED: '#FF0000',
 };
 
 export const FONT_SIZES = {

@@ -3,8 +3,9 @@ import {
   KeyboardTypeOptions,
   StyleSheet,
   TextInput,
+  Text,
 } from 'react-native';
-import React from 'react';
+import React, {useState} from 'react';
 import {COLORS, FONT_SIZES} from '../constants';
 
 type EditInputProps = {
@@ -16,9 +17,12 @@ type EditInputProps = {
   canEdit?: boolean;
   secureTextEntry?: boolean;
   maxLength?: number;
+  validate?: (text: string) => boolean;
+  validateMessage?: string;
 };
 
 const EditInput = (props: EditInputProps) => {
+  const [isError, setIsError] = useState(false);
   const {
     label,
     value,
@@ -27,24 +31,40 @@ const EditInput = (props: EditInputProps) => {
     autoFocus,
     canEdit,
     secureTextEntry,
+    validate,
+    validateMessage,
   } = props;
 
   return (
-    <TextInput
-      {...props}
-      placeholder={label}
-      style={{
-        ...styles.inputStyles,
-        color: canEdit ? COLORS.TEXT_BLACK : COLORS.LIGHT_BLACK,
-      }}
-      value={value || undefined}
-      editable={canEdit}
-      onChangeText={onChangeText}
-      placeholderTextColor={COLORS.LIGHT_BLACK}
-      secureTextEntry={secureTextEntry}
-      keyboardType={keyBoardType}
-      autoFocus={autoFocus || false}
-    />
+    <>
+      <TextInput
+        {...props}
+        placeholder={label}
+        style={{
+          ...styles.inputStyles,
+          color: canEdit ? COLORS.TEXT_BLACK : COLORS.LIGHT_BLACK,
+        }}
+        value={value || undefined}
+        editable={canEdit}
+        onChangeText={text => {
+          if (validate) {
+            setIsError(!validate(text));
+          }
+          if (onChangeText) {
+            onChangeText(text);
+          }
+        }}
+        placeholderTextColor={COLORS.LIGHT_BLACK}
+        secureTextEntry={secureTextEntry}
+        keyboardType={keyBoardType}
+        autoFocus={autoFocus || false}
+      />
+      {isError && (
+        <Text style={{color: COLORS.RED, fontSize: FONT_SIZES.SMALL}}>
+          {validateMessage || 'Invalid input'}
+        </Text>
+      )}
+    </>
   );
 };
 

@@ -18,7 +18,7 @@ async def login_user(loginDto:LoginDto,response:Response):
 async def login_user(loginDto:LoginDto,response:Response):
     delete_sql = f'truncate table {TBL_SESSIONS}'
     await db_query(delete_sql)
-    sql = f'select id,username,password,client_id from {TBL_USERS} where username = %s OR email = %s'
+    sql = f'select id,username,password,client_id,is_owner from {TBL_USERS} where username = %s OR email = %s'
     user = await db_query(sql,[loginDto.username,loginDto.username])
     if len(user) == 0:
         response.status_code = 404
@@ -41,11 +41,21 @@ async def login_user(loginDto:LoginDto,response:Response):
         shows.append(row[0])
     await db_query(login_sql)
     token = '1234567890'
-    return {'token':token,'msg':'User logged in successfully','id':user_id,'clientId' :user[3],'shows':shows}
+    return {'token':token,'msg':'User logged in successfully','id':user_id,'clientId' :user[3],'shows':shows,'isOwner':user[4]}
+
+@router.get('/filter')
+async def get_users(client_id:int):
+    # get query parameters
+    sql = f'select * from {TBL_USERS} where client_id = {client_id} and is_owner=false order by id desc'
+    rows = await db_query(sql)
+    users = []
+    for row in rows:
+        users.append(convert_to_user_all(row))
+    return users
 
 @router.get('/')
 async def get_users():
-    sql = f'select * from {TBL_USERS}'
+    sql = f'select * from {TBL_USERS} order by id desc'
     rows = await db_query(sql)
     users = []
     for row in rows:

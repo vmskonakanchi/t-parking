@@ -5,16 +5,21 @@ import {COLORS, FONT_SIZES} from '../constants';
 type MyButtonProps = {
   title: string;
   onPress: () => void;
+  disabled?: boolean;
 };
 
 const MyButton = (props: MyButtonProps) => {
-  const {title, onPress} = props;
+  const {title, onPress, disabled} = props;
 
   return (
     <TouchableHighlight
       onPress={onPress}
-      style={styles.button}
-      underlayColor={COLORS.TEXT}>
+      style={{
+        ...styles.button,
+        backgroundColor: disabled ? COLORS.PRIMARY_DISABLED : COLORS.PRIMARY,
+      }}
+      underlayColor={COLORS.SECONDARY}
+      disabled={disabled}>
       <Text style={styles.buttonText}>{title}</Text>
     </TouchableHighlight>
   );

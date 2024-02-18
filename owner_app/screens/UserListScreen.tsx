@@ -6,29 +6,35 @@ import {
   Dimensions,
   TouchableHighlight,
   ScrollView,
-} from 'react-native';
-import React, {useEffect, useState} from 'react';
-import {COLORS, SCREEN_NAMES} from '../constants';
-import api from '../api/api';
-import Loader from '../components/Loader';
-import Icon from 'react-native-vector-icons/MaterialIcons';
-import EditInput from '../components/EditInput';
-import MyButton from '../components/MyButton';
+} from "react-native";
+import React, { useEffect, useState } from "react";
+import { COLORS } from "../constants";
+import api from "../api/api";
+import Loader from "../components/Loader";
+import Icon from "react-native-vector-icons/MaterialIcons";
+import EditInput from "../components/EditInput";
+import MyButton from "../components/MyButton";
+import Toast from "react-native-root-toast";
+import { useMMKVStorage } from "react-native-mmkv-storage";
+import storage from "../storage/storage";
+import { LoginUser } from "../storage/types";
+import useStorage from "../storage/storage";
 
 type UserItem = {
-  id: number;
+  id: string;
   name: string;
   username: string;
   phone: string;
   email: string;
 };
 
-const UserListScreen = ({navigation}: any) => {
+const UserListScreen = () => {
   const [users, setUsers] = useState<UserItem[]>([]);
   const [loading, setLoading] = useState(false);
   const [isCreateUser, setIsCreateUser] = useState(false);
+  const [user] = useStorage<LoginUser>("user");
 
-  const renderItem = ({item}: {item: UserItem}) => {
+  const renderItem = ({ item }: { item: UserItem }) => {
     return (
       <View style={styles.userContainer}>
         <Text style={styles.userText}>{item.name}</Text>
@@ -40,10 +46,19 @@ const UserListScreen = ({navigation}: any) => {
 
   const getUsers = async () => {
     try {
-      const {data} = await api.get('/users/');
+      if (!user) {
+        return console.log("Client id not found");
+      }
+      const { data } = await api.get(
+        `/users/filter?client_id=${user.client_id}`
+      );
       setUsers(data);
-    } catch (error: {message: string}) {
-      console.log(error.message);
+    } catch (error: any) {
+      Toast.show(error?.response?.data?.msg || error.message, {
+        duration: Toast.durations.LONG,
+        position: Toast.positions.TOP,
+        backgroundColor: COLORS.RED,
+      });
     }
   };
 
@@ -57,7 +72,7 @@ const UserListScreen = ({navigation}: any) => {
     return (
       <View style={styles.container}>
         <Loader
-          marginTop={Dimensions.get('window').height / 2}
+          marginTop={Dimensions.get("window").height / 2}
           color={COLORS.WHITE}
         />
       </View>
@@ -71,22 +86,24 @@ const UserListScreen = ({navigation}: any) => {
           setLoading={setLoading}
           setUsers={setUsers}
           users={users}
-          clientName="test"
+          clientId={user?.client_id}
+          setCreateUser={setIsCreateUser}
         />
       ) : (
         <FlatList
           data={users}
           style={styles.listContainer}
           renderItem={renderItem}
-          keyExtractor={item => item.id.toString()}
+          keyExtractor={(item) => item.id}
         />
       )}
       <TouchableHighlight
         style={styles.addFab}
         underlayColor={COLORS.SECONDARY}
-        onPress={() => setIsCreateUser(!isCreateUser)}>
+        onPress={() => setIsCreateUser(!isCreateUser)}
+      >
         <Icon
-          name={isCreateUser ? 'arrow-back' : 'add'}
+          name={isCreateUser ? "arrow-back" : "add"}
           color={COLORS.WHITE}
           size={40}
         />
@@ -99,34 +116,50 @@ type CreateUserProps = {
   setLoading: (loading: boolean) => void;
   setUsers: (users: UserItem[]) => void;
   users: UserItem[];
-  clientName: string;
+  setCreateUser: (createUser: boolean) => void;
+  clientId?: number;
 };
 
 const CreateUser = (props: CreateUserProps) => {
-  const {setLoading, setUsers, users, clientName} = props;
+  const { setLoading, setUsers, users, setCreateUser, clientId } = props;
 
   const [details, setDetails] = useState({
-    name: '',
-    phone: '',
-    email: '',
-    username: '',
-    password: '',
+    id: "",
+    name: "",
+    phone: "",
+    email: "",
+    username: "",
+    password: "",
+    client_id: clientId,
   });
 
   const handleChange = (value: string, name: string) => {
-    setDetails({...details, [name]: value});
+    setDetails({ ...details, [name]: value });
   };
 
   const addUser = async () => {
     try {
       setLoading(true);
       details.username = details.email;
-      await api.post('/users/', details);
+      details.password =
+        details.name.substring(0, 2) + details.phone.substring(6, 10);
+      const { data } = await api.post("/users/", details);
+      details.id = users.length + 1 + "";
       setUsers([...users, details]);
       setLoading(false);
-    } catch (error) {
-      console.log(error.message);
+      Toast.show(data.msg, {
+        duration: Toast.durations.LONG,
+        position: Toast.positions.TOP,
+        backgroundColor: COLORS.PRIMARY,
+      });
+      setCreateUser(false);
+    } catch (error: any) {
       setLoading(false);
+      Toast.show(error.response?.data?.msg, {
+        duration: Toast.durations.LONG,
+        position: Toast.positions.TOP,
+        backgroundColor: COLORS.RED,
+      });
     }
   };
 
@@ -135,27 +168,31 @@ const CreateUser = (props: CreateUserProps) => {
       <View style={styles.createUserView}>
         <EditInput
           label="Enter name"
-          onChangeText={text => handleChange(text, 'name')}
+          onChangeText={(text) => handleChange(text, "name")}
+          validate={(text) => text.length > 0}
+          validateMessage="Name is required"
         />
         <EditInput
           label="Enter phone"
           maxLength={10}
           keyBoardType="phone-pad"
-          onChangeText={text => handleChange(text, 'phone')}
+          validate={(text) => text.length === 10}
+          validateMessage="Phone number should be 10 digits"
+          onChangeText={(text) => handleChange(text, "phone")}
         />
         <EditInput
           label="Enter email"
           keyBoardType="email-address"
-          onChangeText={text => handleChange(text, 'email')}
+          onChangeText={(text) => handleChange(text, "email")}
+          validate={(text) => text.includes("@")}
+          validateMessage='Email should contain "@"'
         />
-        <EditInput
-          label="Enter password"
-          onChangeText={text => handleChange(text, 'password')}
-          secureTextEntry={true}
+        <MyButton
+          title="Create User"
+          onPress={addUser}
+          disabled={!details.name || !details.phone || !details.email}
         />
-        <MyButton title="Create User" onPress={addUser} />
       </View>
-      <Text>{JSON.stringify(details, null, 4)}</Text>
     </ScrollView>
   );
 };
@@ -165,15 +202,15 @@ export default UserListScreen;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
+    justifyContent: "center",
+    alignItems: "center",
     backgroundColor: COLORS.SECONDARY,
   },
   listContainer: {
-    marginTop: Dimensions.get('window').height / 20,
+    marginTop: Dimensions.get("window").height / 20,
   },
   userContainer: {
-    width: Dimensions.get('window').width * 0.9,
+    width: Dimensions.get("window").width * 0.9,
     padding: 15,
     marginVertical: 10,
     borderRadius: 10,
@@ -181,12 +218,12 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   userText: {
-    fontFamily: 'Poppins-Regular',
+    fontFamily: "Poppins-Regular",
     fontSize: 20,
     color: COLORS.TEXT_BLACK,
   },
   addFab: {
-    position: 'absolute',
+    position: "absolute",
     margin: 20,
     right: 0,
     bottom: 0,
